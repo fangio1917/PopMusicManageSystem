@@ -1,6 +1,6 @@
 from fastapi import FastAPI
 from router.api_router import router_api
-from middleware import auth_middleware
+from router.middleware import auth_middleware
 
 
 def create_app() -> FastAPI:

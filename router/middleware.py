@@ -5,14 +5,6 @@ from datetime import datetime, timedelta
 from config import SECRET_KEY, ALGORITHM
 
 
-# 创建 JWT 令牌的函数
-def create_token(username: str, password: str) -> str:
-    expiration = datetime.utcnow() + timedelta(hours=1)
-    to_encode = {"exp": expiration, "sub": username}
-    encoded_jwt = jwt.encode(to_encode, SECRET_KEY, algorithm=ALGORITHM)
-    return encoded_jwt
-
-
 async def auth_middleware(request: Request, call_next):
     auth_header = request.headers.get("Authorization")
     if auth_header is None:
