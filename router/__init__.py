@@ -1,13 +1,16 @@
 from fastapi import FastAPI
 from router.api_router import router_api
-from router.middleware import auth_middleware
+from controller.login import router_login
+from router.middleware import AuthMiddleware
 
 
-def create_app() -> FastAPI:
-    app = FastAPI(root_path="/pmms")
-    # 添加中间件
-    app.middleware("http")(auth_middleware)
+app = FastAPI()
 
-    # 添加路由
-    app.include_router(router_api, prefix="/api")
-    return app
+app.include_router(router_login)
+
+api_app = FastAPI()
+api_app.include_router(router_api)
+api_app.middleware("http")(AuthMiddleware)
+# 将子应用程序挂载到主应用程序
+app.mount("/api", api_app)
+

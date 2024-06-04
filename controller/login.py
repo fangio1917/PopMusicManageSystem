@@ -1,11 +1,11 @@
-from fastapi import APIRouter, status
+from fastapi import APIRouter, status, Response
 from model.users import Users
 from .users import UserPydantic
 from datetime import datetime, timedelta
 import jwt
 from config import SECRET_KEY, ALGORITHM
 
-login = APIRouter()
+router_login = APIRouter()
 
 
 def create_token(username: str) -> str:
@@ -15,13 +15,16 @@ def create_token(username: str) -> str:
     return encoded_jwt
 
 
-@login.post("/login")
-async def login(user: UserPydantic):
+@router_login.post("/login", status_code=status.HTTP_200_OK)
+async def login(user: UserPydantic, response: Response):
     try:
         login_user = Users(
             name=user.name,
         )
-        login_user.get_user()
+        res = login_user.get_user()
+        if res is None:
+            raise Exception("User not found")
+        login_user = res[0]
         if login_user is None:
             raise Exception("User not found")
         if login_user.password != user.password:
@@ -29,10 +32,11 @@ async def login(user: UserPydantic):
 
         token = create_token(login_user.name)
 
-        return {"message": "Login successful", "Authorization": token}, status.HTTP_200_OK
+        return {"message": "Login successful", "Authorization": token}
 
     except Exception as e:
-        return {"message": str(e)}, status.HTTP_400_BAD_REQUEST
+        response.status_code = status.HTTP_401_UNAUTHORIZED
+        return {"message": str(e)}
 
 
 
