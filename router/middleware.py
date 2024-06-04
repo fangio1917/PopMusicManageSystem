@@ -1,4 +1,3 @@
-# middlewares.py
 from fastapi import Request, HTTPException
 import jwt
 from config import SECRET_KEY, ALGORITHM
@@ -22,10 +21,6 @@ async def AuthMiddleware(request: Request, call_next):
     response = await call_next(request)
     return response
 
-
-# class AuthMiddleware(BaseHTTPMiddleware):
-#     pass
-#
 
 
 

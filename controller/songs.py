@@ -2,7 +2,7 @@ from datetime import datetime
 from pydantic import BaseModel
 from typing import Optional
 from fastapi import APIRouter, status, Response
-from model.songs import Song
+from model.songs import Songs
 
 
 class SongPydantic(BaseModel):
@@ -24,7 +24,7 @@ router_songs = APIRouter()
 async def add_song(a_song: SongPydantic, response: Response):
     try:
         
-        added_song = Song(**a_song.dict())
+        added_song = Songs(**a_song.dict())
         
         added_song.add_song()
         
@@ -44,7 +44,7 @@ async def get_songs(response: Response,
                     ):
     try:
         
-        queried_songs = Song(
+        queried_songs = Songs(
             id=queried_id,
             name=queried_name,
             singer=queried_singer,
@@ -66,7 +66,7 @@ async def get_songs(response: Response,
 @router_songs.put("/update", status_code=status.HTTP_200_OK)
 async def update_song(u_song: SongPydantic, response: Response):
     try:
-        updated_song = Song(
+        updated_song = Songs(
             id=u_song.id,
         )
         existed = updated_song.exist_songs()
@@ -97,7 +97,7 @@ async def delete_song(deleted_id: int, response: Response):
     
     try:
         
-        deleted_song = Song(
+        deleted_song = Songs(
             id=deleted_id
         )
         

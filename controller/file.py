@@ -1,4 +1,4 @@
-from fastapi import File, UploadFile, APIRouter, status, Response
+from fastapi import UploadFile, APIRouter, status, Response
 import os
 from config import songs_file_path
 from loguru import logger
@@ -7,7 +7,7 @@ router_file = APIRouter()
 
 
 @router_file.post("/upload/", status_code=status.HTTP_201_CREATED)
-async def upload_file(file: UploadFile):
+async def upload_file(file: UploadFile, response: Response):
     try:
         # 获取文件名
         filename = file.filename
@@ -30,5 +30,6 @@ async def upload_file(file: UploadFile):
     
     except Exception as e:
         logger.error(f"文件上传失败: {str(e)}")
+        response.status_code = status.HTTP_500_INTERNAL_SERVER_ERROR
         return {"error": str(e)}
     

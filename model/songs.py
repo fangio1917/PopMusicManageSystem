@@ -4,7 +4,7 @@ from loguru import logger
 
 
 # 定义 Songs 表
-class Song(Base):
+class Songs(Base):
     __tablename__ = 'songs'
     id = Column(Integer, primary_key=True, autoincrement=True)
     name = Column(String(255), nullable=False)
@@ -36,21 +36,21 @@ class Song(Base):
         try:
             with get_session() as session:
                 
-                query = select(Song).where(Song.deleted_at.is_(None))
+                query = select(Songs).where(Songs.deleted_at.is_(None))
                 query_condition = []
                 if self.id is not None:
-                    query = query.where(Song.id == self.id)
+                    query = query.where(Songs.id == self.id)
                     res = session.execute(query)
                     return res.scalars().all()
                 
                 if self.name is not None:
-                    query_condition.append(Song.name == self.name)
+                    query_condition.append(Songs.name == self.name)
                 
                 if self.singer is not None:
-                    query_condition.append(Song.singer == self.singer)
+                    query_condition.append(Songs.singer == self.singer)
                     
                 if self.album is not None:
-                    query_condition.append(Song.album == self.album)
+                    query_condition.append(Songs.album == self.album)
                     
                 query = query.where(or_(*query_condition))
                 res = session.execute(query)
@@ -66,7 +66,7 @@ class Song(Base):
     def update_songs(self):
         try:
             with get_session() as session:
-                session.query(Song).filter(Song.id == self.id and Song.deleted_at.is_(None)).update({
+                session.query(Songs).filter(Songs.id == self.id and Songs.deleted_at.is_(None)).update({
                     'name': self.name,
                     'singer': self.singer,
                     'album': self.album,
@@ -87,7 +87,7 @@ class Song(Base):
     def delete_songs(self):
         try:
             with get_session() as session:
-                session.query(Song).filter(Song.id == self.id and Song.deleted_at.is_(None)).update({
+                session.query(Songs).filter(Songs.id == self.id and Songs.deleted_at.is_(None)).update({
                     'deleted_at': func.now()
                     
                 })
@@ -107,7 +107,7 @@ class Song(Base):
         try:
             with get_session() as session:
                 
-                query = select(Song).where(Song.id == self.id)
+                query = select(Songs).where(Songs.id == self.id)
                 res = session.execute(query)
                 return res.scalars().first()
             
