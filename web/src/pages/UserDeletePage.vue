@@ -23,11 +23,13 @@
 import { event } from 'quasar'
 import { ref, computed } from 'vue'
 import axios from "axios";
+import { useRouter } from 'vue-router'
 
 const { stopAndPrevent } = event
 
 export default {
   setup () {
+    const router = useRouter()
     const inputModel = ref('')
     const inputFillCancelled = ref(false)
     const inputShadowText = computed(() => {
@@ -50,7 +52,7 @@ export default {
         .slice(1)
         .join(inputModel.value)
     })
-    const user_token = 'eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJleHAiOjE3MjEwNjI0MzEsInN1YiI6ImZhbmdpbyJ9.JxBrcVh1cULWl4rd6ImB_KJomJA9BJDOzOJTALxOPjE'
+    const user_token = window.localStorage.getItem('token')
     const textareaModel = ref('')
     const textareaFillCancelled = ref(false)
     const textareaShadowText = computed(() => {
@@ -82,7 +84,7 @@ export default {
       inputShadowText,
 
       deleted_user (){
-         axios.get('https://localhost:8080/api/users/delete',{
+         axios.delete('http://localhost:9000/api/users/delete',{
           headers: {
           'Content-Type': 'application/json',
           'Authorization': 'Bearer ' + user_token
@@ -92,10 +94,20 @@ export default {
            }
         })
         .then(response => {
-          console.log(response.data);
+          if (response.data.success) {
+            console.log(response.data);
+
+            alert('删除成功');
+            router.push('/users');
+          }else{
+            console.log(response.data);
+            alert('删除失败');
+          }
         })
         .catch(error => {
           console.error(error);
+
+          alert('删除错误');
         });
       },
       processInputFill (e) {
@@ -131,6 +143,7 @@ export default {
 
 <style>
 .center_box {
-  margin: 30%;
+  margin-left: 40%;
+  margin-top: 10%;
 }
 </style>

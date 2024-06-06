@@ -2,6 +2,7 @@ from fastapi import FastAPI
 from router.api_router import router_api
 from controller.login import router_login
 from router.middleware import AuthMiddleware
+from fastapi.staticfiles import StaticFiles
 
 
 app = FastAPI()
@@ -13,4 +14,6 @@ api_app = FastAPI()
 api_app.include_router(router_api)
 api_app.middleware("http")(AuthMiddleware)
 app.mount("/api", api_app)
+
+app.mount("/", StaticFiles(directory="web/dist/spa", html=True), name="static")
 

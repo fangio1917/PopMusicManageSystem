@@ -28,10 +28,10 @@ async def add_song(a_song: SongPydantic, response: Response):
         
         added_song.add_song()
         
-        return {"message": "Song added successfully"}
+        return {"success": True, "message": "Song added successfully"}
     except Exception as e:
         response.status_code = status.HTTP_400_BAD_REQUEST
-        return {"message": str(e)}
+        return {"success": False, "message": str(e)}
         
         
 @router_songs.get("/query", status_code=status.HTTP_200_OK)
@@ -43,7 +43,7 @@ async def get_songs(response: Response):
         queried_songs = queried_songs.get_songs()
         if len(queried_songs) == 0:
             response.status_code = status.HTTP_404_NOT_FOUND
-            return {"message": "No songs found"}
+            return {"success": False, "message": "No songs found"}
 
         class ret (BaseModel):
             id: Optional[int] = None
@@ -66,11 +66,11 @@ async def get_songs(response: Response):
 
             datas.append(data.dict())
         
-        return {"message": "Songs found", "data": datas}
+        return {"success": True, "message": "Songs found", "data": datas}
     
     except Exception as e:
         response.status_code = status.HTTP_400_BAD_REQUEST
-        return {"message": str(e)}
+        return {"success": False, "message": str(e)}
     
     
 @router_songs.put("/update", status_code=status.HTTP_200_OK)
@@ -92,14 +92,14 @@ async def update_song(u_song: SongPydantic, response: Response):
             existed.album = u_song.album
             
         if existed.update_songs():
-            return {"message": "Song updated successfully"}
+            return {"success": True, "message": "Song updated successfully"}
         
         response.status_code = status.HTTP_400_BAD_REQUEST
-        return {"message": "Song not updated"}
+        return {"success": False, "message": "Song not updated"}
         
     except Exception as e:
         response.status_code = status.HTTP_400_BAD_REQUEST
-        return {"message": str(e)}
+        return {"success": False, "message": str(e)}
         
         
 @router_songs.delete("/delete", status_code=status.HTTP_200_OK)
@@ -115,13 +115,13 @@ async def delete_song(deleted_id: int, response: Response):
         
         if deleted is True:
             
-            return {"message": "Song deleted successfully"}
+            return {"success": True, "message": "Song deleted successfully"}
         
         response.status_code = status.HTTP_400_BAD_REQUEST
-        return {"message": "Song not deleted"}
+        return {"success": False, "message": "Song not deleted"}
     
     except Exception as e:
         
         response.status_code = status.HTTP_400_BAD_REQUEST
-        return {"message": str(e)}
+        return {"success": False, "message": str(e)}
         

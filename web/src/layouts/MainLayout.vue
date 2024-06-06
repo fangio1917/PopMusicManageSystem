@@ -28,7 +28,7 @@
         <q-item-label
           header
         >
-          Essential Links
+          导航跳转
         </q-item-label>
 
         <EssentialLink
@@ -55,16 +55,22 @@ defineOptions({
 
 const linksList = [
   {
+    title: '首页',
+    caption: '展示平台信息',
+    icon: 'home',
+    link: 'http://localhost:9000/#/index'
+  },
+  {
     title: '歌曲管理',
     caption: '管理您的歌曲',
     icon: 'note',
-    link: 'http://localhost:9000/index#/songs'
+    link: 'http://localhost:9000/#/songs'
   },
   {
     title: '管理员管理',
     caption: '管理此平台的人员',
     icon: 'people',
-    link: "http://localhost:9000/index#/users"
+    link: "http://localhost:9000/#/users"
   },
   {
     title: 'Code',

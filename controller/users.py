@@ -99,9 +99,10 @@ async def get_users(response: Response):
             id: Optional[int] = None
             name: Optional[str] = None
             permission: Optional[str] = None
-        data = ret()
+       
         datas = []
         for res in resp:
+            data = ret()
 
             data.id = res.id
 

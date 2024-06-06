@@ -8,11 +8,7 @@
       :filter="filter"
       :loading="loading"
     >
-
-      <template v-slot:top-left>
-
-      </template>
-
+      <template v-slot:top-left></template>
       <template v-slot:top>
         <q-btn color="primary" :disable="loading" label="增加用户" @click="addRow" />
         <q-btn class="q-ml-sm" color="primary" :disable="loading" label="删除用户" @click="removeRow" />
@@ -24,102 +20,100 @@
           </template>
         </q-input>
       </template>
-
     </q-table>
   </div>
 </template>
 
 <script>
-import { ref } from 'vue'
-import {useRouter} from "vue-router";
-import { mapActions } from 'vuex';
-import axios from "axios";
-
-const user_token = 'eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJleHAiOjE3MjEwNjI0MzEsInN1YiI6ImZhbmdpbyJ9.JxBrcVh1cULWl4rd6ImB_KJomJA9BJDOzOJTALxOPjE'
-
-const columns = [
-  {
-    name: 'id',
-    required: true,
-    label: 'ID',
-    align: 'center',
-    field: row => row.id,
-    format: val => `${val}`,
-    sortable: true
-  },
-  {
-    name: 'name',
-    required: true,
-    label: '姓名',
-    align: 'center',
-    field: row => row.name,
-    format: val => `${val}`,
-    sortable: true
-  },
-  {
-    name: 'permission',
-    required: true,
-    label: '权限',
-    align: 'center',
-    field: row => row.permission,
-    format: val => `${val}`,
-    sortable: true
-  }
-]
-
-const originalRows = []
-
-const getSongs = async () => {
-  axios.get('https://localhost:8080/api/users/query',{
-    headers: {
-    'Content-Type': 'application/json',
-    'Authorization': 'Bearer ' + user_token
-    }
-  })
-  .then(response => {
-    console.log(response.data);
-    originalRows.push(response.data);
-  })
-  .catch(error => {
-    console.error(error);
-  });
-}
+import { onMounted, ref } from 'vue'
+import { useRouter } from 'vue-router'
+import axios from 'axios'
 
 export default {
   setup() {
     const loading = ref(false)
     const filter = ref('')
-    const rowCount = ref(10)
-    const rows = ref([...originalRows])
+    const rows = ref([])
 
-    const router = useRouter();
-    window.onload = function (){
-      getSongs();
+    const columns = [
+      {
+        name: 'id',
+        required: true,
+        label: 'ID',
+        align: 'center',
+        field: row => row.id,
+        format: val => `${val}`,
+        sortable: true
+      },
+      {
+        name: 'name',
+        required: true,
+        label: '姓名',
+        align: 'center',
+        field: row => row.name,
+        format: val => `${val}`,
+        sortable: true
+      },
+      {
+        name: 'permission',
+        required: true,
+        label: '权限',
+        align: 'center',
+        field: row => row.permission,
+        format: val => `${val}`,
+        sortable: true
+      }
+    ]
+
+    const user_token = window.localStorage.getItem('token')
+
+    const getUsers = async () => {
+      console.log('Fetching users...')
+      try {
+        const response = await axios.get('http://localhost:9000/api/users/query', {
+          headers: {
+            'Authorization': `Bearer ${user_token}`
+          }
+        })
+
+        if (response.data.success) {
+          console.log(response.data)
+          rows.value = response.data.data // Assign data directly to rows
+        } else {
+          alert('Fetching users failed: ' + response.data.message)
+        }
+      } catch (error) {
+        console.error('Error fetching users:', error)
+        alert('An error occurred during fetching users')
+      }
+    }
+
+    onMounted(() => {
+      getUsers()
+    })
+
+    const router = useRouter()
+
+    const addRow = () => {
+      router.push('/users/add')
+    }
+
+    const removeRow = () => {
+      router.push('/users/delete')
+    }
+
+    const modifyRow = () => {
+      router.push('/users/modify')
     }
 
     return {
       columns,
       rows,
-
       loading,
       filter,
-      rowCount,
-
-
-      // emulate fetching data from server
-
-      getSongs,
-      addRow() {
-        router.push('/users/add')
-      },
-
-      removeRow() {
-       router.push('/users/delete')
-      },
-
-      modifyRow(){
-        router.push('/users/modify')
-      }
+      addRow,
+      removeRow,
+      modifyRow
     }
   }
 }

@@ -20,29 +20,25 @@ defineOptions({
 
 const ph = ref('');
 const password = ref('');
-const Authorization = ref('');
 const router = useRouter();
 
 const login = async () => {
   console.log('Login button clicked');
   try {
-    const response = await axios.post('localhost:8000/login', {
+    const response = await axios.post('http://localhost:9000/back-end/login', {
       name: ph.value,
       password: password.value,
-    });
+    })
     if (response.data.success) {
       alert('Login successful');
       // 在这里处理登录成功后的逻辑，例如跳转到首页
-      Authorization.value = response.data
+      window.localStorage.setItem("token", response.data.Authorization)
       await router.push('/index');
-
-
     } else {
       alert('Login failed: ' + response.data.message);
     }
   } catch (error) {
     console.error('Error logging in:', error);
-    await router.push('/index');
     alert('An error occurred during login');
   }
 };
@@ -50,6 +46,7 @@ const login = async () => {
 
 <style>
 .login_box {
-  margin: 30%;
+  margin-left: 40%;
+  margin-top: 10%;
 }
 </style>

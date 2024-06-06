@@ -29,124 +29,125 @@
   </div>
 </template>
 
+
+
 <script>
-import { ref } from 'vue'
-import {useRouter} from "vue-router";
-import { mapActions } from 'vuex';
-import axios from "axios";
-
-const user_token = 'eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJleHAiOjE3MjEwNjI0MzEsInN1YiI6ImZhbmdpbyJ9.JxBrcVh1cULWl4rd6ImB_KJomJA9BJDOzOJTALxOPjE'
-
-const columns = [
-  {
-    name: 'id',
-    required: true,
-    label: '编号',
-    align: 'center',
-    field: row => row.id,
-    format: val => `${val}`,
-    sortable: true
-  },
-  {
-    name: 'name',
-    required: true,
-    label: '歌曲',
-    align: 'center',
-    field: row => row.name,
-    format: val => `${val}`,
-    sortable: true
-  },
-  {
-    name: 'singer',
-    required: true,
-    label: '歌手',
-    align: 'center',
-    field: row => row.singer,
-    format: val => `${val}`,
-    sortable: true
-  },
-  {
-    name: 'album',
-    required: true,
-    label: '专辑',
-    align: 'center',
-    field: row => row.album,
-    format: val => `${val}`,
-    sortable: true
-  },
-  {
-    name: 'date',
-    required: true,
-    label: '日期',
-    align: 'center',
-    field: row => row.date,
-    format: val => `${val}`,
-    sortable: true
-  },
-  {
-    name: 'url',
-    required: true,
-    label: '链接',
-    align: 'center',
-    field: row => row.url,
-    format: val => `${val}`,
-    sortable: true
-  }
-]
-
-const originalRows = []
-
-const getSongs = async () => {
-  axios.get('https://localhost:8080/api/users/query',{
-    headers: {
-    'Content-Type': 'application/json',
-    'Authorization': 'Bearer ' + user_token
-    }
-  })
-  .then(response => {
-    console.log(response.data);
-    originalRows.push(response.data);
-  })
-  .catch(error => {
-    console.error(error);
-  });
-}
+import { onMounted, ref } from 'vue'
+import { useRouter } from 'vue-router'
+import axios from 'axios'
 
 export default {
   setup() {
     const loading = ref(false)
     const filter = ref('')
-    const rowCount = ref(10)
-    const rows = ref([...originalRows])
+    const rows = ref([])
 
-    const router = useRouter();
-    window.onload = function (){
-      getSongs();
+    const columns = [
+      {
+        name: 'id',
+        required: true,
+        label: '编号',
+        align: 'center',
+        field: row => row.id,
+        format: val => `${val}`,
+        sortable: true
+      },
+      {
+        name: 'name',
+        required: true,
+        label: '歌曲',
+        align: 'center',
+        field: row => row.name,
+        format: val => `${val}`,
+        sortable: true
+      },
+      {
+        name: 'singer',
+        required: true,
+        label: '歌手',
+        align: 'center',
+        field: row => row.singer,
+        format: val => `${val}`,
+        sortable: true
+      },
+      {
+        name: 'album',
+        required: true,
+        label: '专辑',
+        align: 'center',
+        field: row => row.album,
+        format: val => `${val}`,
+        sortable: true
+      },
+      {
+        name: 'date',
+        required: true,
+        label: '日期',
+        align: 'center',
+        field: row => row.date,
+        format: val => `${val}`,
+        sortable: true
+      },
+      {
+        name: 'url',
+        required: true,
+        label: '链接',
+        align: 'center',
+        field: row => row.url,
+        format: val => `${val}`,
+        sortable: true
+      }
+    ]
+
+    const user_token = window.localStorage.getItem('token')
+
+    const getSongs = async () => {
+      console.log('Fetching users...')
+      try {
+        const response = await axios.get('http://localhost:9000/api/songs/query', {
+          headers: {
+            'Authorization': `Bearer ${user_token}`
+          }
+        })
+
+        if (response.data.success) {
+          console.log(response.data)
+          rows.value = response.data.data // Assign data directly to rows
+        } else {
+          alert('Fetching users failed: ' + response.data.message)
+        }
+      } catch (error) {
+        console.error('Error fetching users:', error)
+        alert('An error occurred during fetching users')
+      }
+    }
+
+    onMounted(() => {
+      getSongs()
+    })
+
+    const router = useRouter()
+
+    const addRow = () => {
+      router.push('/songs/add')
+    }
+
+    const removeRow = () => {
+      router.push('/songs/delete')
+    }
+
+    const modifyRow = () => {
+      router.push('/songs/modify')
     }
 
     return {
       columns,
       rows,
-
       loading,
       filter,
-      rowCount,
-
-
-      // emulate fetching data from server
-
-      getSongs,
-      addRow() {
-        router.push('/songs/add')
-      },
-
-      removeRow() {
-       router.push('/songs/delete')
-      },
-
-      modifyRow(){
-        router.push('/songs/modify')
-      }
+      addRow,
+      removeRow,
+      modifyRow
     }
   }
 }

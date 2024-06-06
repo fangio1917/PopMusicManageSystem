@@ -13,9 +13,10 @@
 <script setup>
 import {ref} from 'vue';
 import axios from 'axios';
+import { useRouter } from 'vue-router'
 // 定义组件名称
 defineOptions({
-  name: 'SongAddPage'
+  name: 'userAddPage'
 });
 
 
@@ -23,14 +24,39 @@ defineOptions({
 const name = ref('');
 const password = ref('');
 const permission = ref('');
-const user_token = 'eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJleHAiOjE3MjEwNjI0MzEsInN1YiI6ImZhbmdpbyJ9.JxBrcVh1cULWl4rd6ImB_KJomJA9BJDOzOJTALxOPjE'
+const user_token = window.localStorage.getItem('token')
+
+const router = useRouter();
 
 const add = async () => {
+   try {
+        const response = await axios.post('http://localhost:9000/api/users/add', {
+          name: name.value,
+          password: password.value,
+          permission: permission.value
+        },{
+          headers: {
+            'Authorization': `Bearer ${user_token}`
+          }
+        })
+
+        if (response.data.success) {
+          console.log(response.data.message)
+          alert('添加成功')
+          await router.push('/users')
+        } else {
+          alert('Fetching users failed: ' + response.data.message)
+        }
+      } catch (error) {
+        console.error('Error fetching user:', error)
+        alert('An error occurred during fetching user')
+      }
 };
 </script>
 
 <style>
 .login_box {
-  margin: 30%;
+  margin-left: 40%;
+  margin-top: 10%;
 }
 </style>

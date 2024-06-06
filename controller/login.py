@@ -15,7 +15,7 @@ def create_token(username: str) -> str:
     return encoded_jwt
 
 
-@router_login.post("/login", status_code=status.HTTP_200_OK)
+@router_login.post("/back-end/login", status_code=status.HTTP_200_OK)
 async def login(user: UserPydantic, response: Response):
     try:
         login_user = Users(
@@ -32,12 +32,11 @@ async def login(user: UserPydantic, response: Response):
 
         token = create_token(login_user.name)
 
-        return {"message": "Login successful", "Authorization": token}
+        return {"success": True, "message": "Login successful", "Authorization": token}
 
     except Exception as e:
         response.status_code = status.HTTP_401_UNAUTHORIZED
-        return {"message": str(e)}
-
+        return {"success": False, "message": str(e)}
 
 
 
